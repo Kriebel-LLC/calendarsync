@@ -1,0 +1,15 @@
+name = "starter"
+main = ".open-next/worker.js"
+compatibility_date = "2025-03-25"
+compatibility_flags = ["nodejs_compat"]
+keep_vars = true
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "starter"
+database_id = "060717cc-02c9-48de-8033-ee5d33027eb0"
+preview_database_id = "DB"                           # Required for Pages local development

@@ -1,0 +1,33 @@
+{
+  "name": "shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:migrate-gen": "dotenv -e .env.local -- drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./src/db/migrations/",
+    "db:migrate-list": "wrangler d1 migrations list starter",
+    "db:migrate-run": "wrangler d1 migrations apply starter",
+    "db:migrate-local": "yarn run db:migrate-run --local",
+    "db:migrate-staging": "yarn run db:migrate-run --preview",
+    "db:migrate-prod": "yarn run db:migrate-run",
+    "db:migrate-drop": "dotenv -e .env.local -- drizzle-kit drop --out=./src/db/migrations/",
+    "fix": "yarn fix:eslint && yarn fix:prettier",
+    "fix:eslint": "eslint --fix .",
+    "fix:prettier": "prettier --write .",
+    "precommit": "yarn fix && tsc --noEmit"
+  },
+  "dependencies": {
+    "firebase": "^9.23.0",
+    "stripe": "^12.18.0",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.14"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

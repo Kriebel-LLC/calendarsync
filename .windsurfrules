@@ -1,0 +1,24 @@
+This codebase is the starter project template for Kriebel LLC, which is often used for creating new niche SaaS applications.
+
+This is a yarn monorepo with all packages in `packages/`
+`packages/web` is a Next.js app, the web application frontend which most of our users interact with. It is hosted on Cloudflare Pages and deployed using the `next-on-pages` library
+`packages/worker` is a Cloudflare Worker which makes up our public API backend, cron jobs, and queue worker.
+`packages/shared` is a TypeScript business logic library meant to be imported in all other packages
+`packages/components` is a shared component library meant to be used within `packages/web` that is from shadcn/ui
+
+Here are the technologies this project uses:
+- Written in **TypeScript**
+- Next.js `/app` dir,
+- Server and Client Components
+- API Routes and Middlewares
+- ORM using **Drizzle**
+- Database on **Cloudflare D1** which is SQLite
+- UI Components built using **Radix UI** and **Shadcn/ui**
+- Documentation and blog using **MDX**
+- Subscriptions using **Stripe**
+- Styled using **Tailwind CSS**
+- Validations using **Zod**
+- Written in **TypeScript**
+- Authentication using **Firebase Auth** adapted for the edge runtime with **next-firebase-auth-edge**
+- Queues from Cloudflare Queues
+- All backend code runs in a Cloudflare Worker in the edge runtime

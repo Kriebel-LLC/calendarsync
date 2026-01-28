@@ -1,0 +1,6 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "starter"
+database_id = "060717cc-02c9-48de-8033-ee5d33027eb0"
+migrations_dir = "src/db/migrations/"
+preview_database_id = "DB"                           # TODO: this should be an ID, not a binding, but local state is determined from this so changing means dumping local db data

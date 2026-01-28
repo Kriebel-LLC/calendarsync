@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1709879318845,
+      "tag": "0000_open_exiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1710095002592,
+      "tag": "0001_glorious_masked_marvel",
+      "breakpoints": true
+    }
+  ]
+}
