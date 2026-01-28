@@ -274,7 +274,7 @@ export default async function IndexPage() {
             <div className="flex flex-col gap-4">
               <h3 className="text-2xl font-bold">Pro</h3>
               <p className="text-4xl font-bold">
-                $9<span className="text-lg font-normal">/month</span>
+                $8<span className="text-lg font-normal">/month</span>
               </p>
               <p className="text-muted-foreground">For professionals and teams</p>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
@@ -283,12 +283,12 @@ export default async function IndexPage() {
                   calendar connections
                 </li>
                 <li className="flex items-center">
-                  <Icons.check className="mr-2 h-4 w-4 text-primary" /> Real-time
+                  <Icons.check className="mr-2 h-4 w-4 text-primary" /> 15-minute
                   sync
                 </li>
                 <li className="flex items-center">
-                  <Icons.check className="mr-2 h-4 w-4 text-primary" /> All
-                  export destinations
+                  <Icons.check className="mr-2 h-4 w-4 text-primary" /> Unlimited
+                  destinations
                 </li>
                 <li className="flex items-center">
                   <Icons.check className="mr-2 h-4 w-4 text-primary" /> Unlimited

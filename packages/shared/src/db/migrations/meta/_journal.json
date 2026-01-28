@@ -15,6 +15,13 @@
       "when": 1710095002592,
       "tag": "0001_glorious_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769615790664,
+      "tag": "0002_confused_lionheart",
+      "breakpoints": true
     }
   ]
 }

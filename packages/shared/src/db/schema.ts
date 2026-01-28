@@ -50,10 +50,14 @@ export const orgs = sqliteTable(
   {
     id: text("id", { length: 191 }).primaryKey().notNull(),
     name: text("name", { length: 191 }).notNull(),
-    plan: text("plan", { enum: [Plan.FREE, Plan.PAID] })
+    plan: text("plan", { enum: [Plan.FREE, Plan.PRO] })
       .default(Plan.FREE)
       .notNull(),
     stripeCustomerId: text("stripe_customer_id", { length: 191 }),
+    stripeSubscriptionId: text("stripe_subscription_id", { length: 191 }),
+    stripeCurrentPeriodEnd: integer("stripe_current_period_end", {
+      mode: "timestamp",
+    }),
     createdAt: integer("created_at", {
       mode: "timestamp",
     })
@@ -71,6 +75,9 @@ export const orgs = sqliteTable(
       stripeCustomerIdKey: uniqueIndex("orgs_stripe_customer_id_key").on(
         table.stripeCustomerId
       ),
+      stripeSubscriptionIdKey: uniqueIndex(
+        "orgs_stripe_subscription_id_key"
+      ).on(table.stripeSubscriptionId),
       nameIdKey: uniqueIndex("orgs_name_id_key").on(table.name),
     };
   }
