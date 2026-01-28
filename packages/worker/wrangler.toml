@@ -26,7 +26,8 @@ workers_dev = true
 # queue = <STAGING_QUEUE_NAME>
 
 [env.staging.triggers]
-crons = ["0 * * * *"]
+# Run every 15 minutes for scheduled calendar syncs
+crons = ["*/15 * * * *"]
 
 [env.production]
 
@@ -38,7 +39,8 @@ crons = ["0 * * * *"]
 # queue = <PROD_QUEUE_NAME>
 
 [env.production.triggers]
-crons = ["0 * * * *"]
+# Run every 15 minutes for scheduled calendar syncs
+crons = ["*/15 * * * *"]
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv

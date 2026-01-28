@@ -9,7 +9,9 @@
     "fix": "yarn fix:eslint && yarn fix:prettier",
     "fix:eslint": "eslint --fix .",
     "fix:prettier": "prettier --write .",
-    "precommit": "yarn fix && tsc --noEmit"
+    "precommit": "yarn fix && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "drizzle-orm": "^0.30.8",
@@ -19,9 +21,11 @@
     "stripe": "^12.18.0"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.12.7",
     "@cloudflare/workers-types": "^4.20240222.0",
     "itty-router": "^3.0.12",
     "typescript": "^5.0.4",
+    "vitest": "^4.0.18",
     "wrangler": "^3.32.0"
   },
   "lint-staged": {

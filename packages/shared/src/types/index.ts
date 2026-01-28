@@ -23,6 +23,9 @@ export interface Env {
   AWS_ACCESS_KEY_ID: string;
   AWS_SECRET_ACCESS_KEY: string;
   NEXT_PUBLIC_ENVIRONMENT: Environment;
+  // Google OAuth for Calendar and Sheets API
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
 }
 
 export interface DBEnv {
