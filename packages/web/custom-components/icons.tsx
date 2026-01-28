@@ -18,6 +18,7 @@ import {
   Pizza,
   Plus,
   Settings,
+  Sparkles,
   SunMedium,
   Trash,
   Twitter,
@@ -72,4 +73,6 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
+  x: X,
+  sparkles: Sparkles,
 };

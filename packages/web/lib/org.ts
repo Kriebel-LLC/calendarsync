@@ -28,11 +28,13 @@ export async function verifyUserHasPermissionForOrgId(
   return hasPermission(roleRecord.role, role);
 }
 
-interface OrgUserResult {
+export interface OrgUserResult {
   orgId: string;
   orgPlan: Plan;
   role: Role;
   orgStripeCustomerId: string | null;
+  orgStripeSubscriptionId: string | null;
+  orgStripeCurrentPeriodEnd: Date | null;
 }
 
 export async function getOrgUserForOrgName(
@@ -45,6 +47,8 @@ export async function getOrgUserForOrgName(
       orgPlan: orgs.plan,
       role: orgUsers.role,
       orgStripeCustomerId: orgs.stripeCustomerId,
+      orgStripeSubscriptionId: orgs.stripeSubscriptionId,
+      orgStripeCurrentPeriodEnd: orgs.stripeCurrentPeriodEnd,
     })
     .from(orgs)
     .innerJoin(orgUsers, eq(orgs.id, orgUsers.orgId))
@@ -174,6 +178,8 @@ export async function getOrgsForUser(userId: string): Promise<Org[]> {
       name: orgs.name,
       plan: orgs.plan,
       stripeCustomerId: orgs.stripeCustomerId,
+      stripeSubscriptionId: orgs.stripeSubscriptionId,
+      stripeCurrentPeriodEnd: orgs.stripeCurrentPeriodEnd,
       createdAt: orgs.createdAt,
       updatedAt: orgs.updatedAt,
     })
