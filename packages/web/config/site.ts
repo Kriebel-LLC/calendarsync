@@ -1,10 +1,11 @@
 import { SiteConfig } from "types";
 
 export const siteConfig: SiteConfig = {
-  name: "Starter",
-  description: "Kriebel LLC's start application",
-  url: "https://starter.kriebel.io",
-  ogImage: "https://starter.kriebel.io/og.jpg",
+  name: "CalendarSync",
+  description:
+    "Automatically sync your Google Calendar events to spreadsheets and databases. Perfect for time tracking, project billing, event reporting, and attendance logging.",
+  url: "https://calendarsync.io",
+  ogImage: "https://calendarsync.io/og.jpg",
   links: {
     twitter: "https://x.com/kriebelco",
   },
