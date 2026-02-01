@@ -65,31 +65,18 @@ async function processWithConcurrency<T, R>(
   concurrency: number
 ): Promise<R[]> {
   const results: R[] = [];
-  const executing: Promise<void>[] = [];
+  const executing: Set<Promise<void>> = new Set();
 
   for (const item of items) {
     const promise = processor(item).then((result) => {
       results.push(result);
+      executing.delete(promise);
     });
 
-    executing.push(promise);
+    executing.add(promise);
 
-    if (executing.length >= concurrency) {
+    if (executing.size >= concurrency) {
       await Promise.race(executing);
-      // Remove completed promises
-      const newExecuting: Promise<void>[] = [];
-      for (const p of executing) {
-        // Check if promise is still pending by racing with a resolved promise
-        const status = await Promise.race([
-          p.then(() => "resolved" as const),
-          Promise.resolve("pending" as const),
-        ]);
-        if (status === "pending") {
-          newExecuting.push(p);
-        }
-      }
-      executing.length = 0;
-      executing.push(...newExecuting);
     }
   }
 

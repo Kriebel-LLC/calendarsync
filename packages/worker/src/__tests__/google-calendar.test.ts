@@ -4,7 +4,7 @@ import { WorkerEnv } from "../types";
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+global.fetch = mockFetch as unknown as typeof fetch;
 
 describe("GoogleCalendarClient", () => {
   const mockEnv: WorkerEnv = {
