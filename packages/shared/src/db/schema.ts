@@ -132,8 +132,45 @@ export const orgUsers = sqliteTable("org_users", {
     .$onUpdate(() => new Date()),
 });
 
+// Calendar connection for Google Calendar OAuth
+export const calendarConnections = sqliteTable(
+  "calendar_connections",
+  {
+    id: text("id", { length: 191 }).primaryKey().notNull(),
+    userId: text("user_id", { length: 191 }).notNull(),
+    // Encrypted tokens (encrypted with AES-GCM)
+    accessTokenEncrypted: text("access_token_encrypted").notNull(),
+    refreshTokenEncrypted: text("refresh_token_encrypted").notNull(),
+    // Token expiry as timestamp in milliseconds
+    tokenExpiry: integer("token_expiry", { mode: "timestamp_ms" }).notNull(),
+    // JSON array of selected calendar IDs
+    calendarIds: text("calendar_ids").notNull().default("[]"),
+    // Google account email for display purposes
+    googleEmail: text("google_email", { length: 191 }),
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    updatedAt: integer("updated_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      userIdIdx: uniqueIndex("calendar_connections_user_id_idx").on(
+        table.userId
+      ),
+    };
+  }
+);
+
 export type User = InferSelectModel<typeof users>;
 export type Org = InferSelectModel<typeof orgs>;
 export type OrgInvite = InferSelectModel<typeof orgInvites>;
 export type OrgUser = InferSelectModel<typeof orgUsers>;
 export type OrgUserWithDetail = OrgUser & UserDetail;
+export type CalendarConnection = InferSelectModel<typeof calendarConnections>;

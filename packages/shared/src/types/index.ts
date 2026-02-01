@@ -23,6 +23,11 @@ export interface Env {
   AWS_ACCESS_KEY_ID: string;
   AWS_SECRET_ACCESS_KEY: string;
   NEXT_PUBLIC_ENVIRONMENT: Environment;
+  // Google Calendar OAuth
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  // Encryption key for token storage (should be 32+ characters)
+  TOKEN_ENCRYPTION_SECRET: string;
 }
 
 export interface DBEnv {
