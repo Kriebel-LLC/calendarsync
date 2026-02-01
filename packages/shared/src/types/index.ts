@@ -27,6 +27,9 @@ export interface Env {
   // Google OAuth for Calendar and Sheets access
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  // Airtable OAuth
+  AIRTABLE_CLIENT_ID: string;
+  AIRTABLE_CLIENT_SECRET: string;
 }
 
 export interface DBEnv {
