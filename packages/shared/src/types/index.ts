@@ -5,6 +5,7 @@ export type UndefinedObject<T> = {
 };
 
 export interface Env {
+  NEXT_PUBLIC_APP_URL: string;
   SMTP_FROM: string;
   STRIPE_API_KEY: string;
   STRIPE_SECRET_KEY: string;
@@ -23,11 +24,9 @@ export interface Env {
   AWS_ACCESS_KEY_ID: string;
   AWS_SECRET_ACCESS_KEY: string;
   NEXT_PUBLIC_ENVIRONMENT: Environment;
-  // Google Calendar OAuth
+  // Google OAuth for Calendar and Sheets access
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
-  // Encryption key for token storage (should be 32+ characters)
-  TOKEN_ENCRYPTION_SECRET: string;
 }
 
 export interface DBEnv {

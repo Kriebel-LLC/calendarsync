@@ -132,21 +132,17 @@ export const orgUsers = sqliteTable("org_users", {
     .$onUpdate(() => new Date()),
 });
 
-// Calendar connection for Google Calendar OAuth
-export const calendarConnections = sqliteTable(
-  "calendar_connections",
+// Google OAuth connections - stores OAuth tokens for Google APIs
+export const googleConnections = sqliteTable(
+  "google_connections",
   {
     id: text("id", { length: 191 }).primaryKey().notNull(),
-    userId: text("user_id", { length: 191 }).notNull(),
-    // Encrypted tokens (encrypted with AES-GCM)
-    accessTokenEncrypted: text("access_token_encrypted").notNull(),
-    refreshTokenEncrypted: text("refresh_token_encrypted").notNull(),
-    // Token expiry as timestamp in milliseconds
-    tokenExpiry: integer("token_expiry", { mode: "timestamp_ms" }).notNull(),
-    // JSON array of selected calendar IDs
-    calendarIds: text("calendar_ids").notNull().default("[]"),
-    // Google account email for display purposes
-    googleEmail: text("google_email", { length: 191 }),
+    orgId: text("org_id", { length: 191 }).notNull(),
+    email: text("email", { length: 191 }).notNull(),
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    scopes: text("scopes").notNull(), // JSON array of granted scopes
     createdAt: integer("created_at", {
       mode: "timestamp",
     })
@@ -161,8 +157,138 @@ export const calendarConnections = sqliteTable(
   },
   (table) => {
     return {
-      userIdIdx: uniqueIndex("calendar_connections_user_id_idx").on(
-        table.userId
+      orgEmailKey: uniqueIndex("google_connections_org_email_key").on(
+        table.orgId,
+        table.email
+      ),
+    };
+  }
+);
+
+// Destination types enum
+export enum DestinationType {
+  GOOGLE_SHEETS = "google_sheets",
+}
+
+// Destinations - where calendar events are synced to
+export const destinations = sqliteTable("destinations", {
+  id: text("id", { length: 191 }).primaryKey().notNull(),
+  orgId: text("org_id", { length: 191 }).notNull(),
+  googleConnectionId: text("google_connection_id", { length: 191 }).notNull(),
+  type: text("type", { enum: [DestinationType.GOOGLE_SHEETS] }).notNull(),
+  name: text("name", { length: 191 }).notNull(),
+  // Google Sheets specific config
+  spreadsheetId: text("spreadsheet_id", { length: 191 }),
+  spreadsheetName: text("spreadsheet_name", { length: 191 }),
+  sheetId: integer("sheet_id"),
+  sheetName: text("sheet_name", { length: 191 }),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).default(true).notNull(),
+  createdAt: integer("created_at", {
+    mode: "timestamp",
+  })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  updatedAt: integer("updated_at", {
+    mode: "timestamp",
+  })
+    .default(sql`(unixepoch())`)
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+// Calendars - Google Calendar sources
+export const calendars = sqliteTable("calendars", {
+  id: text("id", { length: 191 }).primaryKey().notNull(),
+  orgId: text("org_id", { length: 191 }).notNull(),
+  googleConnectionId: text("google_connection_id", { length: 191 }).notNull(),
+  googleCalendarId: text("google_calendar_id", { length: 191 }).notNull(),
+  name: text("name", { length: 191 }).notNull(),
+  color: text("color", { length: 7 }), // hex color
+  isEnabled: integer("is_enabled", { mode: "boolean" }).default(true).notNull(),
+  createdAt: integer("created_at", {
+    mode: "timestamp",
+  })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  updatedAt: integer("updated_at", {
+    mode: "timestamp",
+  })
+    .default(sql`(unixepoch())`)
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+// Sync configurations - links calendars to destinations
+export const syncConfigs = sqliteTable(
+  "sync_configs",
+  {
+    id: text("id", { length: 191 }).primaryKey().notNull(),
+    orgId: text("org_id", { length: 191 }).notNull(),
+    calendarId: text("calendar_id", { length: 191 }).notNull(),
+    destinationId: text("destination_id", { length: 191 }).notNull(),
+    // Incremental sync token from Google Calendar API
+    syncToken: text("sync_token"),
+    lastSyncAt: integer("last_sync_at", { mode: "timestamp" }),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).default(true).notNull(),
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    updatedAt: integer("updated_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      calDestKey: uniqueIndex("sync_configs_cal_dest_key").on(
+        table.calendarId,
+        table.destinationId
+      ),
+    };
+  }
+);
+
+// Event status enum
+export enum SyncedEventStatus {
+  ACTIVE = "active",
+  CANCELLED = "cancelled",
+}
+
+// Synced events - tracks events that have been synced for smart updates/deletes
+export const syncedEvents = sqliteTable(
+  "synced_events",
+  {
+    id: text("id", { length: 191 }).primaryKey().notNull(),
+    syncConfigId: text("sync_config_id", { length: 191 }).notNull(),
+    googleEventId: text("google_event_id", { length: 191 }).notNull(),
+    // Row number in the spreadsheet for updates
+    sheetRowNumber: integer("sheet_row_number"),
+    // Event data for comparison to detect changes
+    eventHash: text("event_hash", { length: 64 }), // SHA-256 hash of event data
+    status: text("status", { enum: [SyncedEventStatus.ACTIVE, SyncedEventStatus.CANCELLED] })
+      .default(SyncedEventStatus.ACTIVE)
+      .notNull(),
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    updatedAt: integer("updated_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      syncEventKey: uniqueIndex("synced_events_sync_event_key").on(
+        table.syncConfigId,
+        table.googleEventId
       ),
     };
   }
@@ -173,4 +299,8 @@ export type Org = InferSelectModel<typeof orgs>;
 export type OrgInvite = InferSelectModel<typeof orgInvites>;
 export type OrgUser = InferSelectModel<typeof orgUsers>;
 export type OrgUserWithDetail = OrgUser & UserDetail;
-export type CalendarConnection = InferSelectModel<typeof calendarConnections>;
+export type GoogleConnection = InferSelectModel<typeof googleConnections>;
+export type Destination = InferSelectModel<typeof destinations>;
+export type Calendar = InferSelectModel<typeof calendars>;
+export type SyncConfig = InferSelectModel<typeof syncConfigs>;
+export type SyncedEvent = InferSelectModel<typeof syncedEvents>;
