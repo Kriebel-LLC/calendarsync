@@ -168,20 +168,63 @@ export const googleConnections = sqliteTable(
 // Destination types enum
 export enum DestinationType {
   GOOGLE_SHEETS = "google_sheets",
+  AIRTABLE = "airtable",
 }
+
+// Airtable OAuth connections
+export const airtableConnections = sqliteTable(
+  "airtable_connections",
+  {
+    id: text("id", { length: 191 }).primaryKey().notNull(),
+    orgId: text("org_id", { length: 191 }).notNull(),
+    airtableUserId: text("airtable_user_id", { length: 191 }).notNull(),
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    refreshExpiresAt: integer("refresh_expires_at", { mode: "timestamp" }).notNull(),
+    scopes: text("scopes").notNull(), // JSON array of granted scopes
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    updatedAt: integer("updated_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      orgUserIdKey: uniqueIndex("airtable_connections_org_user_id_key").on(
+        table.orgId,
+        table.airtableUserId
+      ),
+    };
+  }
+);
 
 // Destinations - where calendar events are synced to
 export const destinations = sqliteTable("destinations", {
   id: text("id", { length: 191 }).primaryKey().notNull(),
   orgId: text("org_id", { length: 191 }).notNull(),
-  googleConnectionId: text("google_connection_id", { length: 191 }).notNull(),
-  type: text("type", { enum: [DestinationType.GOOGLE_SHEETS] }).notNull(),
+  // For Google destinations
+  googleConnectionId: text("google_connection_id", { length: 191 }),
+  // For Airtable destinations
+  airtableConnectionId: text("airtable_connection_id", { length: 191 }),
+  type: text("type", { enum: [DestinationType.GOOGLE_SHEETS, DestinationType.AIRTABLE] }).notNull(),
   name: text("name", { length: 191 }).notNull(),
   // Google Sheets specific config
   spreadsheetId: text("spreadsheet_id", { length: 191 }),
   spreadsheetName: text("spreadsheet_name", { length: 191 }),
   sheetId: integer("sheet_id"),
   sheetName: text("sheet_name", { length: 191 }),
+  // Airtable specific config
+  airtableBaseId: text("airtable_base_id", { length: 191 }),
+  airtableBaseName: text("airtable_base_name", { length: 191 }),
+  airtableTableId: text("airtable_table_id", { length: 191 }),
+  airtableTableName: text("airtable_table_name", { length: 191 }),
   isEnabled: integer("is_enabled", { mode: "boolean" }).default(true).notNull(),
   createdAt: integer("created_at", {
     mode: "timestamp",
@@ -265,8 +308,10 @@ export const syncedEvents = sqliteTable(
     id: text("id", { length: 191 }).primaryKey().notNull(),
     syncConfigId: text("sync_config_id", { length: 191 }).notNull(),
     googleEventId: text("google_event_id", { length: 191 }).notNull(),
-    // Row number in the spreadsheet for updates
+    // Row number in the spreadsheet for updates (Google Sheets)
     sheetRowNumber: integer("sheet_row_number"),
+    // Record ID in Airtable for updates
+    airtableRecordId: text("airtable_record_id", { length: 191 }),
     // Event data for comparison to detect changes
     eventHash: text("event_hash", { length: 64 }), // SHA-256 hash of event data
     status: text("status", { enum: [SyncedEventStatus.ACTIVE, SyncedEventStatus.CANCELLED] })
@@ -300,6 +345,7 @@ export type OrgInvite = InferSelectModel<typeof orgInvites>;
 export type OrgUser = InferSelectModel<typeof orgUsers>;
 export type OrgUserWithDetail = OrgUser & UserDetail;
 export type GoogleConnection = InferSelectModel<typeof googleConnections>;
+export type AirtableConnection = InferSelectModel<typeof airtableConnections>;
 export type Destination = InferSelectModel<typeof destinations>;
 export type Calendar = InferSelectModel<typeof calendars>;
 export type SyncConfig = InferSelectModel<typeof syncConfigs>;
