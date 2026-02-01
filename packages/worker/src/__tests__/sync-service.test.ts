@@ -149,9 +149,7 @@ describe("SyncService", () => {
 
       // Setup sync events response
       mockSyncEvents.mockResolvedValue({
-        events: [
-          { id: "event1", summary: "Test Event", status: "confirmed" },
-        ],
+        events: [{ id: "event1", summary: "Test Event", status: "confirmed" }],
         nextSyncToken: "new-sync-token",
         deletedEventIds: [],
       });

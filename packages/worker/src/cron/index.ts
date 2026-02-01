@@ -30,7 +30,9 @@ export async function handleCron(env: WorkerEnv): Promise<void> {
     const results = await processWithConcurrency(
       syncsToProcess,
       async (config) => {
-        console.log(`Processing sync config ${config.id} for user ${config.userId}`);
+        console.log(
+          `Processing sync config ${config.id} for user ${config.userId}`
+        );
         return syncService.processSync(config);
       },
       5 // Process 5 syncs concurrently
@@ -48,9 +50,7 @@ export async function handleCron(env: WorkerEnv): Promise<void> {
     // Log failures for debugging
     for (const result of results) {
       if (!result.success) {
-        console.error(
-          `Sync ${result.syncConfigId} failed: ${result.error}`
-        );
+        console.error(`Sync ${result.syncConfigId} failed: ${result.error}`);
       }
     }
   } catch (error) {

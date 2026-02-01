@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { GoogleCalendarClient, CalendarEvent } from "../services/google-calendar";
+import {
+  GoogleCalendarClient,
+  CalendarEvent,
+} from "../services/google-calendar";
 import { WorkerEnv } from "../types";
 
 // Mock fetch

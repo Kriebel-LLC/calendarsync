@@ -19,7 +19,11 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
   private sheetName: string;
   private existingEventIds: Map<string, number> = new Map(); // eventId -> row number
 
-  constructor(accessToken: string, spreadsheetId: string, sheetName = "Events") {
+  constructor(
+    accessToken: string,
+    spreadsheetId: string,
+    sheetName = "Events"
+  ) {
     this.accessToken = accessToken;
     this.spreadsheetId = spreadsheetId;
     this.sheetName = sheetName;
@@ -60,7 +64,9 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
   async initialize(): Promise<void> {
     // Read existing data to build index of eventIds to row numbers
     const range = `${this.sheetName}!A:A`;
-    const url = `${SHEETS_API_BASE}/${this.spreadsheetId}/values/${encodeURIComponent(range)}`;
+    const url = `${SHEETS_API_BASE}/${
+      this.spreadsheetId
+    }/values/${encodeURIComponent(range)}`;
     const response = await this.fetchWithAuth(url);
 
     if (response.status === 400) {
@@ -93,7 +99,9 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
 
     if (!infoResponse.ok) {
       const error = await infoResponse.text();
-      throw new Error(`Failed to get spreadsheet info: ${infoResponse.status} - ${error}`);
+      throw new Error(
+        `Failed to get spreadsheet info: ${infoResponse.status} - ${error}`
+      );
     }
 
     const spreadsheet = (await infoResponse.json()) as {
@@ -126,7 +134,9 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
 
       if (!createResponse.ok) {
         const error = await createResponse.text();
-        throw new Error(`Failed to create sheet: ${createResponse.status} - ${error}`);
+        throw new Error(
+          `Failed to create sheet: ${createResponse.status} - ${error}`
+        );
       }
     }
 
@@ -136,7 +146,9 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
 
   private async writeHeaders(): Promise<void> {
     const range = `${this.sheetName}!A1:M1`;
-    const url = `${SHEETS_API_BASE}/${this.spreadsheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`;
+    const url = `${SHEETS_API_BASE}/${
+      this.spreadsheetId
+    }/values/${encodeURIComponent(range)}?valueInputOption=RAW`;
 
     const response = await this.fetchWithAuth(url, {
       method: "PUT",
@@ -207,7 +219,11 @@ export class GoogleSheetsAdapter implements DestinationAdapter {
 
     // Append new rows
     if (rowsToAppend.length > 0) {
-      const appendUrl = `${SHEETS_API_BASE}/${this.spreadsheetId}/values/${encodeURIComponent(this.sheetName)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+      const appendUrl = `${SHEETS_API_BASE}/${
+        this.spreadsheetId
+      }/values/${encodeURIComponent(
+        this.sheetName
+      )}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
       const appendResponse = await this.fetchWithAuth(appendUrl, {
         method: "POST",
         body: JSON.stringify({

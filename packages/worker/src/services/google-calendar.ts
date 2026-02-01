@@ -79,10 +79,14 @@ export class GoogleCalendarClient {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to list calendars: ${response.status} - ${error}`);
+      throw new Error(
+        `Failed to list calendars: ${response.status} - ${error}`
+      );
     }
 
-    const data = (await response.json()) as { items: Array<{ id: string; summary: string; primary?: boolean }> };
+    const data = (await response.json()) as {
+      items: Array<{ id: string; summary: string; primary?: boolean }>;
+    };
     return data.items || [];
   }
 
@@ -113,7 +117,9 @@ export class GoogleCalendarClient {
         params.set("pageToken", nextPageToken);
       }
 
-      const url = `${GOOGLE_CALENDAR_API_BASE}/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`;
+      const url = `${GOOGLE_CALENDAR_API_BASE}/calendars/${encodeURIComponent(
+        calendarId
+      )}/events?${params.toString()}`;
       const response = await this.fetchWithAuth(url);
 
       if (response.status === 410) {
@@ -125,9 +131,7 @@ export class GoogleCalendarClient {
 
       if (!response.ok) {
         const error = await response.text();
-        throw new Error(
-          `Failed to sync events: ${response.status} - ${error}`
-        );
+        throw new Error(`Failed to sync events: ${response.status} - ${error}`);
       }
 
       const data = (await response.json()) as CalendarEventListResponse;
@@ -172,7 +176,9 @@ export async function refreshAccessToken(
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Failed to refresh access token: ${response.status} - ${error}`);
+    throw new Error(
+      `Failed to refresh access token: ${response.status} - ${error}`
+    );
   }
 
   const data = (await response.json()) as {

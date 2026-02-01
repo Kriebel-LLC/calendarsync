@@ -54,7 +54,10 @@ export class NotionAdapter implements DestinationAdapter {
     let cursor: string | null = null;
 
     do {
-      const body: { filter: { property: string; rich_text: { is_not_empty: boolean } }; start_cursor?: string } = {
+      const body: {
+        filter: { property: string; rich_text: { is_not_empty: boolean } };
+        start_cursor?: string;
+      } = {
         filter: {
           property: "Event ID",
           rich_text: {
@@ -77,7 +80,9 @@ export class NotionAdapter implements DestinationAdapter {
 
       if (!response.ok) {
         const error = await response.text();
-        throw new Error(`Failed to query Notion database: ${response.status} - ${error}`);
+        throw new Error(
+          `Failed to query Notion database: ${response.status} - ${error}`
+        );
       }
 
       const data = (await response.json()) as NotionQueryResponse;
@@ -96,7 +101,9 @@ export class NotionAdapter implements DestinationAdapter {
     } while (cursor);
   }
 
-  private eventToNotionProperties(event: CalendarEvent): Record<string, unknown> {
+  private eventToNotionProperties(
+    event: CalendarEvent
+  ): Record<string, unknown> {
     const row = transformEventToRow(event);
 
     return {
@@ -174,13 +181,16 @@ export class NotionAdapter implements DestinationAdapter {
           }
         } else {
           // Create new page
-          const response = await this.fetchWithAuth(`${NOTION_API_BASE}/pages`, {
-            method: "POST",
-            body: JSON.stringify({
-              parent: { database_id: this.databaseId },
-              properties,
-            }),
-          });
+          const response = await this.fetchWithAuth(
+            `${NOTION_API_BASE}/pages`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                parent: { database_id: this.databaseId },
+                properties,
+              }),
+            }
+          );
 
           if (!response.ok) {
             const error = await response.text();

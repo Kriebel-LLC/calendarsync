@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SyncConfig, SyncStatus, SyncFrequency, DestinationType } from "shared/src/db/schema";
+import {
+  SyncConfig,
+  SyncStatus,
+  SyncFrequency,
+  DestinationType,
+} from "shared/src/db/schema";
 
 // Mock the sync service module
 const mockGetDueSyncs = vi.fn();
@@ -110,16 +115,19 @@ describe("handleCron", () => {
 
   it("should limit syncs per cron run to prevent timeout", async () => {
     // Create more than MAX_SYNCS_PER_CRON (50) syncs
-    const mockSyncs: Partial<SyncConfig>[] = Array.from({ length: 60 }, (_, i) => ({
-      id: `sync${i}`,
-      userId: `user${i}`,
-      name: `Sync ${i}`,
-      calendarId: "primary",
-      destinationType: DestinationType.GOOGLE_SHEETS,
-      destinationId: `sheet${i}`,
-      syncFrequency: SyncFrequency.EVERY_15_MINUTES,
-      status: SyncStatus.ACTIVE,
-    }));
+    const mockSyncs: Partial<SyncConfig>[] = Array.from(
+      { length: 60 },
+      (_, i) => ({
+        id: `sync${i}`,
+        userId: `user${i}`,
+        name: `Sync ${i}`,
+        calendarId: "primary",
+        destinationType: DestinationType.GOOGLE_SHEETS,
+        destinationId: `sheet${i}`,
+        syncFrequency: SyncFrequency.EVERY_15_MINUTES,
+        status: SyncStatus.ACTIVE,
+      })
+    );
 
     mockGetDueSyncs.mockResolvedValue(mockSyncs);
     mockProcessSync.mockImplementation(async (config: Partial<SyncConfig>) => ({

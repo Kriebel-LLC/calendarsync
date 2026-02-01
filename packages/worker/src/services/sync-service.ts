@@ -13,11 +13,17 @@ import {
 } from "shared/src/db/schema";
 import { WorkerEnv } from "../types";
 import { GoogleCalendarClient, refreshAccessToken } from "./google-calendar";
-import { GoogleSheetsAdapter, NotionAdapter, DestinationAdapter } from "./destinations";
+import {
+  GoogleSheetsAdapter,
+  NotionAdapter,
+  DestinationAdapter,
+} from "./destinations";
 
 // Generate a simple unique ID
 function generateId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+  return `${Date.now().toString(36)}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
 }
 
 export interface SyncResult {
@@ -152,8 +158,7 @@ export class SyncService {
           lastSyncAt: new Date(),
           nextSyncAt,
           lastErrorMessage: errors.length > 0 ? errors.join("; ") : null,
-          status:
-            errors.length > 0 ? SyncStatus.ERROR : SyncStatus.ACTIVE,
+          status: errors.length > 0 ? SyncStatus.ERROR : SyncStatus.ACTIVE,
         })
         .where(eq(syncConfigs.id, config.id));
 
