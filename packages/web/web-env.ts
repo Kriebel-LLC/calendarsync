@@ -22,9 +22,16 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: z.string().min(1),
     AWS_SECRET_ACCESS_KEY: z.string().min(1),
     NEXT_PUBLIC_ENVIRONMENT: z.nativeEnum(Environment),
-    // Google Calendar OAuth
+    // Google OAuth (for Calendar/Sheets)
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    // Airtable OAuth
+    AIRTABLE_CLIENT_ID: z.string().min(1),
+    AIRTABLE_CLIENT_SECRET: z.string().min(1),
+    // Notion OAuth
+    NOTION_CLIENT_ID: z.string().min(1),
+    NOTION_CLIENT_SECRET: z.string().min(1),
+    // Encryption secret for storing OAuth tokens (min 32 chars)
     TOKEN_ENCRYPTION_SECRET: z.string().min(32),
   },
   client: {
@@ -65,9 +72,12 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
-    // Google Calendar OAuth
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    AIRTABLE_CLIENT_ID: process.env.AIRTABLE_CLIENT_ID,
+    AIRTABLE_CLIENT_SECRET: process.env.AIRTABLE_CLIENT_SECRET,
+    NOTION_CLIENT_ID: process.env.NOTION_CLIENT_ID,
+    NOTION_CLIENT_SECRET: process.env.NOTION_CLIENT_SECRET,
     TOKEN_ENCRYPTION_SECRET: process.env.TOKEN_ENCRYPTION_SECRET,
   },
 });

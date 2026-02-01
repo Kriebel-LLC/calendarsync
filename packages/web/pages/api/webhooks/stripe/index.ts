@@ -30,10 +30,7 @@ async function handleSubscriptionCreated(event: Stripe.Event) {
     return;
   }
 
-  const newPlan = stripePriceIdToPlan(
-    subscription.items.data[0].price.id,
-    env
-  );
+  const newPlan = stripePriceIdToPlan(subscription.items.data[0].price.id, env);
 
   if (!newPlan) {
     console.error(
@@ -90,20 +87,14 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
   }
 
   // Only process active or trialing subscriptions
-  if (
-    subscription.status !== "active" &&
-    subscription.status !== "trialing"
-  ) {
+  if (subscription.status !== "active" && subscription.status !== "trialing") {
     console.log(
       `Ignoring subscription update with status: ${subscription.status}`
     );
     return;
   }
 
-  const newPlan = stripePriceIdToPlan(
-    subscription.items.data[0].price.id,
-    env
-  );
+  const newPlan = stripePriceIdToPlan(subscription.items.data[0].price.id, env);
 
   if (!newPlan) {
     console.error(
@@ -158,10 +149,7 @@ async function handleUserSubscriptionUpdated(
   subscription: Stripe.Subscription,
   userId: string
 ) {
-  if (
-    subscription.status !== "active" &&
-    subscription.status !== "trialing"
-  ) {
+  if (subscription.status !== "active" && subscription.status !== "trialing") {
     return;
   }
 
@@ -171,9 +159,7 @@ async function handleUserSubscriptionUpdated(
       stripeSubscriptionId: subscription.id,
       stripeCustomerId: subscription.customer as string,
       stripePriceId: subscription.items.data[0].price.id,
-      stripeCurrentPeriodEnd: new Date(
-        subscription.current_period_end * 1000
-      ),
+      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
     })
     .where(eq(users.id, userId));
 

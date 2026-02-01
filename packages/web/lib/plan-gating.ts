@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { eq, sql } from "drizzle-orm";
-import { orgs } from "shared/src/db/schema";
+import { eq, sql, count } from "drizzle-orm";
+import { orgs, calendars, destinations } from "shared/src/db/schema";
 import {
   Plan,
   getPlanLimits,
@@ -18,23 +18,25 @@ export interface UsageStats {
 }
 
 export async function getOrgUsageStats(orgId: string): Promise<UsageStats> {
-  // Get org plan
-  const [orgRecord] = await db()
-    .select({ plan: orgs.plan })
-    .from(orgs)
-    .where(eq(orgs.id, orgId));
+  // Get org plan and counts in parallel
+  const [orgResult, calendarsResult, destinationsResult] = await Promise.all([
+    db().select({ plan: orgs.plan }).from(orgs).where(eq(orgs.id, orgId)),
+    db()
+      .select({ count: count() })
+      .from(calendars)
+      .where(eq(calendars.orgId, orgId)),
+    db()
+      .select({ count: count() })
+      .from(destinations)
+      .where(eq(destinations.orgId, orgId)),
+  ]);
 
-  const plan = orgRecord?.plan || Plan.FREE;
+  const plan = orgResult[0]?.plan || Plan.FREE;
   const limits = getPlanLimits(plan);
 
-  // TODO: Once calendars and destinations tables are created, query actual counts
-  // For now, return mock counts of 0
-  const calendarsCount = 0;
-  const destinationsCount = 0;
-
   return {
-    calendarsCount,
-    destinationsCount,
+    calendarsCount: calendarsResult[0]?.count ?? 0,
+    destinationsCount: destinationsResult[0]?.count ?? 0,
     maxCalendars: limits.maxCalendars,
     maxDestinations: limits.maxDestinations,
     syncIntervalMinutes: limits.syncIntervalMinutes,
@@ -50,7 +52,9 @@ export async function checkCanAddCalendar(
   if (stats.calendarsCount >= stats.maxCalendars) {
     return {
       allowed: false,
-      reason: `You've reached the maximum of ${stats.maxCalendars} calendar${stats.maxCalendars === 1 ? "" : "s"} on your current plan. Upgrade to Pro for unlimited calendars.`,
+      reason: `You've reached the maximum of ${stats.maxCalendars} calendar${
+        stats.maxCalendars === 1 ? "" : "s"
+      } on your current plan. Upgrade to Pro for unlimited calendars.`,
     };
   }
 
@@ -65,7 +69,11 @@ export async function checkCanAddDestination(
   if (stats.destinationsCount >= stats.maxDestinations) {
     return {
       allowed: false,
-      reason: `You've reached the maximum of ${stats.maxDestinations} destination${stats.maxDestinations === 1 ? "" : "s"} on your current plan. Upgrade to Pro for unlimited destinations.`,
+      reason: `You've reached the maximum of ${
+        stats.maxDestinations
+      } destination${
+        stats.maxDestinations === 1 ? "" : "s"
+      } on your current plan. Upgrade to Pro for unlimited destinations.`,
     };
   }
 
@@ -84,4 +92,8 @@ export function formatSyncInterval(minutes: number): string {
   }
 }
 
-export { canAddCalendar, canAddDestination, getPlanLimits } from "shared/src/types/plan";
+export {
+  canAddCalendar,
+  canAddDestination,
+  getPlanLimits,
+} from "shared/src/types/plan";
