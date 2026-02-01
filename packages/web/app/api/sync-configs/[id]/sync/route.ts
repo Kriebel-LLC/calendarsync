@@ -16,7 +16,10 @@ import {
   SyncedEventStatus,
   DestinationType,
 } from "shared/src/db/schema";
-import { syncCalendarToSheet, SyncedEventRecord } from "shared/src/sync-service";
+import {
+  syncCalendarToSheet,
+  SyncedEventRecord,
+} from "shared/src/sync-service";
 import {
   syncCalendarToAirtable,
   AirtableSyncedEventRecord,
@@ -97,7 +100,11 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
   // Handle different destination types
   if (destination.type === DestinationType.AIRTABLE) {
     // Airtable sync
-    if (!destination.airtableConnectionId || !destination.airtableBaseId || !destination.airtableTableId) {
+    if (
+      !destination.airtableConnectionId ||
+      !destination.airtableBaseId ||
+      !destination.airtableTableId
+    ) {
       return NextResponse.json(
         { error: "Airtable destination missing required configuration" },
         { status: 400 }
@@ -127,16 +134,19 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
       },
       {
         getGoogleAccessToken: () => getValidAccessToken(googleConnection),
-        getAirtableAccessToken: () => getValidAirtableAccessToken(airtableConnection),
-        getSyncedEvents: async (configId: string): Promise<AirtableSyncedEventRecord[]> => {
+        getAirtableAccessToken: () =>
+          getValidAirtableAccessToken(airtableConnection),
+        getSyncedEvents: async (
+          configId: string
+        ): Promise<AirtableSyncedEventRecord[]> => {
           const events = await db()
             .select()
             .from(syncedEvents)
             .where(eq(syncedEvents.syncConfigId, configId));
           return events.map((e) => ({
             id: e.id,
-            syncConfigId: e.syncConfigId,
-            googleEventId: e.googleEventId,
+            syncConfigId: e.syncConfigId!,
+            googleEventId: e.externalEventId,
             airtableRecordId: e.airtableRecordId,
             eventHash: e.eventHash,
             status: e.status as "active" | "cancelled",
@@ -149,7 +159,7 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
             .where(
               and(
                 eq(syncedEvents.syncConfigId, event.syncConfigId),
-                eq(syncedEvents.googleEventId, event.googleEventId)
+                eq(syncedEvents.externalEventId, event.googleEventId)
               )
             );
 
@@ -168,7 +178,7 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
               .values({
                 id: event.id,
                 syncConfigId: event.syncConfigId,
-                googleEventId: event.googleEventId,
+                externalEventId: event.googleEventId,
                 airtableRecordId: event.airtableRecordId,
                 eventHash: event.eventHash,
                 status: event.status as SyncedEventStatus,
@@ -218,15 +228,17 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
       },
       {
         getAccessToken: () => getValidAccessToken(googleConnection),
-        getSyncedEvents: async (configId: string): Promise<SyncedEventRecord[]> => {
+        getSyncedEvents: async (
+          configId: string
+        ): Promise<SyncedEventRecord[]> => {
           const events = await db()
             .select()
             .from(syncedEvents)
             .where(eq(syncedEvents.syncConfigId, configId));
           return events.map((e) => ({
             id: e.id,
-            syncConfigId: e.syncConfigId,
-            googleEventId: e.googleEventId,
+            syncConfigId: e.syncConfigId!,
+            googleEventId: e.externalEventId,
             sheetRowNumber: e.sheetRowNumber,
             eventHash: e.eventHash,
             status: e.status as "active" | "cancelled",
@@ -239,7 +251,7 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
             .where(
               and(
                 eq(syncedEvents.syncConfigId, event.syncConfigId),
-                eq(syncedEvents.googleEventId, event.googleEventId)
+                eq(syncedEvents.externalEventId, event.googleEventId)
               )
             );
 
@@ -258,7 +270,7 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
               .values({
                 id: event.id,
                 syncConfigId: event.syncConfigId,
-                googleEventId: event.googleEventId,
+                externalEventId: event.googleEventId,
                 sheetRowNumber: event.sheetRowNumber,
                 eventHash: event.eventHash,
                 status: event.status as SyncedEventStatus,
