@@ -165,11 +165,38 @@ export const googleConnections = sqliteTable(
   }
 );
 
-// Destination types enum
-export enum DestinationType {
-  GOOGLE_SHEETS = "google_sheets",
-  AIRTABLE = "airtable",
-}
+// Notion OAuth connections for destination sync
+export const notionConnections = sqliteTable(
+  "notion_connections",
+  {
+    id: text("id", { length: 191 }).primaryKey().notNull(),
+    userId: text("user_id", { length: 191 }).notNull(),
+    accessTokenEncrypted: text("access_token_encrypted").notNull(),
+    workspaceId: text("workspace_id", { length: 191 }),
+    workspaceName: text("workspace_name", { length: 191 }),
+    workspaceIcon: text("workspace_icon"),
+    botId: text("bot_id", { length: 191 }),
+    // Selected database for syncing calendar events
+    selectedDatabaseId: text("selected_database_id", { length: 191 }),
+    selectedDatabaseName: text("selected_database_name", { length: 191 }),
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    updatedAt: integer("updated_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      userIdKey: uniqueIndex("notion_connections_user_id_key").on(table.userId),
+    };
+  }
+);
 
 // Airtable OAuth connections
 export const airtableConnections = sqliteTable(
@@ -181,7 +208,9 @@ export const airtableConnections = sqliteTable(
     accessToken: text("access_token").notNull(),
     refreshToken: text("refresh_token").notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
-    refreshExpiresAt: integer("refresh_expires_at", { mode: "timestamp" }).notNull(),
+    refreshExpiresAt: integer("refresh_expires_at", {
+      mode: "timestamp",
+    }).notNull(),
     scopes: text("scopes").notNull(), // JSON array of granted scopes
     createdAt: integer("created_at", {
       mode: "timestamp",
@@ -205,21 +234,39 @@ export const airtableConnections = sqliteTable(
   }
 );
 
+// Destination types enum
+export enum DestinationType {
+  GOOGLE_SHEETS = "google_sheets",
+  NOTION = "notion",
+  AIRTABLE = "airtable",
+}
+
 // Destinations - where calendar events are synced to
 export const destinations = sqliteTable("destinations", {
   id: text("id", { length: 191 }).primaryKey().notNull(),
   orgId: text("org_id", { length: 191 }).notNull(),
   // For Google destinations
   googleConnectionId: text("google_connection_id", { length: 191 }),
+  // For Notion destinations
+  notionConnectionId: text("notion_connection_id", { length: 191 }),
   // For Airtable destinations
   airtableConnectionId: text("airtable_connection_id", { length: 191 }),
-  type: text("type", { enum: [DestinationType.GOOGLE_SHEETS, DestinationType.AIRTABLE] }).notNull(),
+  type: text("type", {
+    enum: [
+      DestinationType.GOOGLE_SHEETS,
+      DestinationType.NOTION,
+      DestinationType.AIRTABLE,
+    ],
+  }).notNull(),
   name: text("name", { length: 191 }).notNull(),
   // Google Sheets specific config
   spreadsheetId: text("spreadsheet_id", { length: 191 }),
   spreadsheetName: text("spreadsheet_name", { length: 191 }),
   sheetId: integer("sheet_id"),
   sheetName: text("sheet_name", { length: 191 }),
+  // Notion specific config
+  notionDatabaseId: text("notion_database_id", { length: 191 }),
+  notionDatabaseName: text("notion_database_name", { length: 191 }),
   // Airtable specific config
   airtableBaseId: text("airtable_base_id", { length: 191 }),
   airtableBaseName: text("airtable_base_name", { length: 191 }),
@@ -306,16 +353,35 @@ export const syncedEvents = sqliteTable(
   "synced_events",
   {
     id: text("id", { length: 191 }).primaryKey().notNull(),
-    syncConfigId: text("sync_config_id", { length: 191 }).notNull(),
-    googleEventId: text("google_event_id", { length: 191 }).notNull(),
-    // Row number in the spreadsheet for updates (Google Sheets)
+    syncConfigId: text("sync_config_id", { length: 191 }),
+    userId: text("user_id", { length: 191 }),
+    // External event ID from the calendar source (e.g., Google Calendar event ID)
+    externalEventId: text("external_event_id", { length: 191 }).notNull(),
+    // For Google Sheets: row number in the spreadsheet
     sheetRowNumber: integer("sheet_row_number"),
-    // Record ID in Airtable for updates
+    // For Notion: page ID where this event was synced
+    notionPageId: text("notion_page_id", { length: 191 }),
+    // For Airtable: record ID
     airtableRecordId: text("airtable_record_id", { length: 191 }),
-    // Event data for comparison to detect changes
+    // Calendar source info
+    calendarId: text("calendar_id", { length: 191 }),
+    calendarName: text("calendar_name", { length: 191 }),
+    // Event details (cached for comparison during sync)
+    eventTitle: text("event_title"),
+    eventStart: integer("event_start", { mode: "timestamp" }),
+    eventEnd: integer("event_end", { mode: "timestamp" }),
+    // Event data hash for change detection
     eventHash: text("event_hash", { length: 64 }), // SHA-256 hash of event data
-    status: text("status", { enum: [SyncedEventStatus.ACTIVE, SyncedEventStatus.CANCELLED] })
+    status: text("status", {
+      enum: [SyncedEventStatus.ACTIVE, SyncedEventStatus.CANCELLED],
+    })
       .default(SyncedEventStatus.ACTIVE)
+      .notNull(),
+    // Sync metadata
+    lastSyncedAt: integer("last_synced_at", {
+      mode: "timestamp",
+    })
+      .default(sql`(unixepoch())`)
       .notNull(),
     createdAt: integer("created_at", {
       mode: "timestamp",
@@ -331,9 +397,19 @@ export const syncedEvents = sqliteTable(
   },
   (table) => {
     return {
+      // For Google Sheets/Airtable sync config lookups
       syncEventKey: uniqueIndex("synced_events_sync_event_key").on(
         table.syncConfigId,
-        table.googleEventId
+        table.externalEventId
+      ),
+      // For Notion user event lookups
+      userEventKey: uniqueIndex("synced_events_user_event_key").on(
+        table.userId,
+        table.externalEventId
+      ),
+      // Index for looking up by Notion page ID
+      notionPageIdIdx: uniqueIndex("synced_events_notion_page_id_idx").on(
+        table.notionPageId
       ),
     };
   }
@@ -345,6 +421,7 @@ export type OrgInvite = InferSelectModel<typeof orgInvites>;
 export type OrgUser = InferSelectModel<typeof orgUsers>;
 export type OrgUserWithDetail = OrgUser & UserDetail;
 export type GoogleConnection = InferSelectModel<typeof googleConnections>;
+export type NotionConnection = InferSelectModel<typeof notionConnections>;
 export type AirtableConnection = InferSelectModel<typeof airtableConnections>;
 export type Destination = InferSelectModel<typeof destinations>;
 export type Calendar = InferSelectModel<typeof calendars>;

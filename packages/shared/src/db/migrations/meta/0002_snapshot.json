@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "781d35e2-75fe-4cf4-83fe-67431c7c067f",
-  "prevId": "b5522eea-ae7b-4918-abb2-adb620f94b5c",
   "tables": {
     "org_invites": {
       "name": "org_invites",
@@ -85,7 +83,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "org_users": {
       "name": "org_users",
@@ -139,7 +138,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "orgs": {
       "name": "orgs",
@@ -229,7 +229,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "users": {
       "name": "users",
@@ -305,13 +306,16 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "781d35e2-75fe-4cf4-83fe-67431c7c067f",
+  "prevId": "b5522eea-ae7b-4918-abb2-adb620f94b5c",
+  "views": {}
 }

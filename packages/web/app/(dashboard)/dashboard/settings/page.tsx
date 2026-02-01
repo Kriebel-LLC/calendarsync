@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 
 import { DashboardHeader } from "@/custom-components/header";
+import { NotionSettings } from "@/custom-components/notion-settings";
 import { DashboardShell } from "@/custom-components/shell";
 import { UserNameForm } from "@/custom-components/user-name-form";
+import { getNotionConnectionInfo } from "@/lib/notion/notion-connection";
 import { getCurrentServerUser } from "@/lib/session";
 import { cookies } from "next/headers";
 
@@ -18,6 +20,8 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
+  const notionConnection = await getNotionConnectionInfo(user.uid);
+
   return (
     <DashboardShell>
       <DashboardHeader
@@ -26,6 +30,7 @@ export default async function SettingsPage() {
       />
       <div className="grid gap-10">
         <UserNameForm user={{ uid: user.uid, displayName: user.name || "" }} />
+        <NotionSettings initialConnection={notionConnection} />
       </div>
     </DashboardShell>
   );

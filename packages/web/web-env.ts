@@ -22,10 +22,17 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: z.string().min(1),
     AWS_SECRET_ACCESS_KEY: z.string().min(1),
     NEXT_PUBLIC_ENVIRONMENT: z.nativeEnum(Environment),
+    // Google OAuth (for Calendar/Sheets)
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    // Airtable OAuth
     AIRTABLE_CLIENT_ID: z.string().min(1),
     AIRTABLE_CLIENT_SECRET: z.string().min(1),
+    // Notion OAuth
+    NOTION_CLIENT_ID: z.string().min(1),
+    NOTION_CLIENT_SECRET: z.string().min(1),
+    // Encryption secret for storing OAuth tokens (min 32 chars)
+    TOKEN_ENCRYPTION_SECRET: z.string().min(32),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().min(1),
@@ -69,5 +76,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     AIRTABLE_CLIENT_ID: process.env.AIRTABLE_CLIENT_ID,
     AIRTABLE_CLIENT_SECRET: process.env.AIRTABLE_CLIENT_SECRET,
+    NOTION_CLIENT_ID: process.env.NOTION_CLIENT_ID,
+    NOTION_CLIENT_SECRET: process.env.NOTION_CLIENT_SECRET,
+    TOKEN_ENCRYPTION_SECRET: process.env.TOKEN_ENCRYPTION_SECRET,
   },
 });
