@@ -1,6 +1,9 @@
 import Link from "next/link";
 
-import { getPlanFeatures, PRO_PLAN_PRICE_MONTHLY } from "@/config/subscriptions";
+import {
+  getPlanFeatures,
+  PRO_PLAN_PRICE_MONTHLY,
+} from "@/config/subscriptions";
 import { Icons } from "@/custom-components/icons";
 import { cn } from "components/lib/utils";
 import { buttonVariants } from "components/ui/button";
@@ -117,7 +120,9 @@ export default function PricingPage() {
             </p>
           </div>
           <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">What payment methods do you accept?</h3>
+            <h3 className="font-semibold">
+              What payment methods do you accept?
+            </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               We accept all major credit cards through Stripe, including Visa,
               Mastercard, and American Express.

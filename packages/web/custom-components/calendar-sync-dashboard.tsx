@@ -10,11 +10,7 @@ import {
   CardTitle,
 } from "components/ui/card";
 import { Badge } from "components/ui/badge";
-import {
-  Calendar,
-  Destination,
-  SyncConfig,
-} from "shared/src/db/schema";
+import { Calendar, Destination, SyncConfig } from "shared/src/db/schema";
 import { UsageStats } from "@/lib/plan-gating";
 import { ConnectGoogleButton } from "./connect-google-button";
 import { AddCalendarDialog } from "./add-calendar-dialog";
@@ -62,9 +58,7 @@ export function CalendarSyncDashboard({
       <Card>
         <CardHeader>
           <CardTitle>Usage</CardTitle>
-          <CardDescription>
-            Your current plan limits and usage
-          </CardDescription>
+          <CardDescription>Your current plan limits and usage</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
@@ -108,13 +102,16 @@ export function CalendarSyncDashboard({
                 Connect your Google account to access Calendar and Sheets
               </CardDescription>
             </div>
-            {canWrite && <ConnectGoogleButton orgId={orgId} orgName={orgName} />}
+            {canWrite && (
+              <ConnectGoogleButton orgId={orgId} orgName={orgName} />
+            )}
           </div>
         </CardHeader>
         <CardContent>
           {connections.length === 0 ? (
             <p className="text-muted-foreground">
-              No Google accounts connected yet. Connect an account to get started.
+              No Google accounts connected yet. Connect an account to get
+              started.
             </p>
           ) : (
             <div className="space-y-2">
@@ -124,8 +121,8 @@ export function CalendarSyncDashboard({
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <span className="text-blue-600 text-sm font-medium">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                      <span className="text-sm font-medium text-blue-600">
                         {connection.email[0].toUpperCase()}
                       </span>
                     </div>
@@ -262,7 +259,8 @@ export function CalendarSyncDashboard({
         <CardContent>
           {!hasCalendars || !hasDestinations ? (
             <p className="text-muted-foreground">
-              Add at least one calendar and one destination to create sync configurations.
+              Add at least one calendar and one destination to create sync
+              configurations.
             </p>
           ) : syncConfigs.length === 0 ? (
             <p className="text-muted-foreground">
@@ -271,7 +269,9 @@ export function CalendarSyncDashboard({
           ) : (
             <div className="space-y-2">
               {syncConfigs.map((config) => {
-                const calendar = calendars.find((c) => c.id === config.calendarId);
+                const calendar = calendars.find(
+                  (c) => c.id === config.calendarId
+                );
                 const destination = destinations.find(
                   (d) => d.id === config.destinationId
                 );
@@ -287,7 +287,8 @@ export function CalendarSyncDashboard({
                       </span>
                       {config.lastSyncAt && (
                         <p className="text-sm text-muted-foreground">
-                          Last synced: {new Date(config.lastSyncAt).toLocaleString()}
+                          Last synced:{" "}
+                          {new Date(config.lastSyncAt).toLocaleString()}
                         </p>
                       )}
                     </div>

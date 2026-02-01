@@ -72,7 +72,11 @@ export const GET = routeHandler(async (req, user) => {
 
   const { orgId } = query.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.READ);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.READ
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
@@ -97,9 +101,14 @@ export const POST = routeHandler(async (req, user) => {
   const data = body.data;
 
   // Determine the type
-  const destinationType = "type" in data ? data.type : DestinationType.GOOGLE_SHEETS;
+  const destinationType =
+    "type" in data ? data.type : DestinationType.GOOGLE_SHEETS;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, data.orgId, Role.WRITE);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    data.orgId,
+    Role.WRITE
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

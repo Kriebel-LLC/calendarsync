@@ -6,7 +6,9 @@ import { refreshAccessToken } from "shared/src/google-oauth";
 
 const TOKEN_REFRESH_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 
-export async function getValidAccessToken(connection: GoogleConnection): Promise<string> {
+export async function getValidAccessToken(
+  connection: GoogleConnection
+): Promise<string> {
   const now = Date.now();
   const expiresAt = connection.expiresAt.getTime();
 

@@ -53,9 +53,9 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Icons.calendar className="h-12 w-12 text-muted-foreground mb-4" />
+              <Icons.calendar className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold">No organization found</h3>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Create an organization to start syncing calendars.
               </p>
             </div>
@@ -180,9 +180,9 @@ export default async function DashboardPage() {
         <CardContent>
           {connections.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Icons.google className="h-12 w-12 text-muted-foreground mb-4" />
+              <Icons.google className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold">No accounts connected</h3>
-              <p className="text-sm text-muted-foreground mt-1 mb-4">
+              <p className="mb-4 mt-1 text-sm text-muted-foreground">
                 Connect your Google account to start syncing calendar events.
               </p>
               <Link href={`/${orgName}`}>
@@ -244,9 +244,9 @@ export default async function DashboardPage() {
         <CardContent>
           {userSyncs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Icons.refresh className="h-12 w-12 text-muted-foreground mb-4" />
+              <Icons.refresh className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold">No syncs configured</h3>
-              <p className="text-sm text-muted-foreground mt-1 mb-4">
+              <p className="mb-4 mt-1 text-sm text-muted-foreground">
                 Create a sync to start exporting calendar events.
               </p>
               <Link href={`/${orgName}`}>
@@ -264,7 +264,7 @@ export default async function DashboardPage() {
                   href={`/${orgName}`}
                   className="block"
                 >
-                  <div className="flex items-center justify-between border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Icons.calendar className="h-5 w-5 text-muted-foreground" />
@@ -274,8 +274,7 @@ export default async function DashboardPage() {
                       </div>
                       <Icons.arrowRight className="h-4 w-4 text-muted-foreground" />
                       <div className="flex items-center gap-2">
-                        {destination?.type ===
-                        DestinationType.GOOGLE_SHEETS ? (
+                        {destination?.type === DestinationType.GOOGLE_SHEETS ? (
                           <Icons.spreadsheet className="h-5 w-5 text-muted-foreground" />
                         ) : (
                           <Icons.page className="h-5 w-5 text-muted-foreground" />

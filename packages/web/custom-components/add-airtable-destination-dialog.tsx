@@ -188,7 +188,9 @@ export function AddAirtableDestinationDialog({
       onOpenChange(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add destination");
+      setError(
+        err instanceof Error ? err.message : "Failed to add destination"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -235,9 +237,7 @@ export function AddAirtableDestinationDialog({
                 <SelectTrigger>
                   <SelectValue
                     placeholder={
-                      isLoadingBases
-                        ? "Loading bases..."
-                        : "Select a base"
+                      isLoadingBases ? "Loading bases..." : "Select a base"
                     }
                   />
                 </SelectTrigger>
@@ -298,9 +298,7 @@ export function AddAirtableDestinationDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={
-              !selectedTable || !destinationName.trim() || isSubmitting
-            }
+            disabled={!selectedTable || !destinationName.trim() || isSubmitting}
           >
             {isSubmitting ? "Adding..." : "Add Destination"}
           </Button>

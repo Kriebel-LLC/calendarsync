@@ -20,7 +20,9 @@ export async function getValidAirtableAccessToken(
   // Check if refresh token is still valid
   const refreshExpiresAt = connection.refreshExpiresAt.getTime();
   if (now > refreshExpiresAt) {
-    throw new Error("Airtable refresh token has expired. Please reconnect your Airtable account.");
+    throw new Error(
+      "Airtable refresh token has expired. Please reconnect your Airtable account."
+    );
   }
 
   // Refresh the token
@@ -34,7 +36,9 @@ export async function getValidAirtableAccessToken(
   );
 
   const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000);
-  const newRefreshExpiresAt = new Date(Date.now() + tokens.refresh_expires_in * 1000);
+  const newRefreshExpiresAt = new Date(
+    Date.now() + tokens.refresh_expires_in * 1000
+  );
 
   // Update the connection with new tokens
   await db()

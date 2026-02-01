@@ -8,7 +8,10 @@ interface ConnectGoogleButtonProps {
   orgName: string;
 }
 
-export function ConnectGoogleButton({ orgId, orgName }: ConnectGoogleButtonProps) {
+export function ConnectGoogleButton({
+  orgId,
+  orgName,
+}: ConnectGoogleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleConnect() {

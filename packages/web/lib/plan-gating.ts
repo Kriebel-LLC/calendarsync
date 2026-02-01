@@ -52,7 +52,9 @@ export async function checkCanAddCalendar(
   if (stats.calendarsCount >= stats.maxCalendars) {
     return {
       allowed: false,
-      reason: `You've reached the maximum of ${stats.maxCalendars} calendar${stats.maxCalendars === 1 ? "" : "s"} on your current plan. Upgrade to Pro for unlimited calendars.`,
+      reason: `You've reached the maximum of ${stats.maxCalendars} calendar${
+        stats.maxCalendars === 1 ? "" : "s"
+      } on your current plan. Upgrade to Pro for unlimited calendars.`,
     };
   }
 
@@ -67,7 +69,11 @@ export async function checkCanAddDestination(
   if (stats.destinationsCount >= stats.maxDestinations) {
     return {
       allowed: false,
-      reason: `You've reached the maximum of ${stats.maxDestinations} destination${stats.maxDestinations === 1 ? "" : "s"} on your current plan. Upgrade to Pro for unlimited destinations.`,
+      reason: `You've reached the maximum of ${
+        stats.maxDestinations
+      } destination${
+        stats.maxDestinations === 1 ? "" : "s"
+      } on your current plan. Upgrade to Pro for unlimited destinations.`,
     };
   }
 
@@ -86,4 +92,8 @@ export function formatSyncInterval(minutes: number): string {
   }
 }
 
-export { canAddCalendar, canAddDestination, getPlanLimits } from "shared/src/types/plan";
+export {
+  canAddCalendar,
+  canAddDestination,
+  getPlanLimits,
+} from "shared/src/types/plan";

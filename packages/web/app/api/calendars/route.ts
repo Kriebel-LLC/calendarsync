@@ -34,7 +34,11 @@ export const GET = routeHandler(async (req, user) => {
 
   const { orgId } = query.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.READ);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.READ
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
@@ -56,9 +60,14 @@ export const POST = routeHandler(async (req, user) => {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const { orgId, googleConnectionId, googleCalendarId, name, color } = body.data;
+  const { orgId, googleConnectionId, googleCalendarId, name, color } =
+    body.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.WRITE);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.WRITE
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

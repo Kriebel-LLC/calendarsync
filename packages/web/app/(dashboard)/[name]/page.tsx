@@ -47,10 +47,7 @@ export default async function DashboardPage({
       })
       .from(googleConnections)
       .where(eq(googleConnections.orgId, userInOrg.orgId)),
-    db()
-      .select()
-      .from(calendars)
-      .where(eq(calendars.orgId, userInOrg.orgId)),
+    db().select().from(calendars).where(eq(calendars.orgId, userInOrg.orgId)),
     db()
       .select()
       .from(destinations)

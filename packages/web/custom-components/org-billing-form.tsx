@@ -2,7 +2,10 @@
 
 import * as React from "react";
 
-import { getPlanFeatures, PRO_PLAN_PRICE_MONTHLY } from "@/config/subscriptions";
+import {
+  getPlanFeatures,
+  PRO_PLAN_PRICE_MONTHLY,
+} from "@/config/subscriptions";
 import { Icons } from "@/custom-components/icons";
 import { clientFetch } from "@/lib/fetch";
 import { cn } from "components/lib/utils";

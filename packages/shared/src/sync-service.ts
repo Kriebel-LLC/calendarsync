@@ -11,6 +11,23 @@ import {
   initializeSheet,
 } from "./google-sheets";
 
+export interface FilterConfig {
+  timeRangeStart?: string; // ISO date string
+  timeRangeEnd?: string; // ISO date string
+  keywords?: string[]; // Keywords to filter event titles
+}
+
+export interface ColumnMapping {
+  title?: string;
+  start?: string;
+  end?: string;
+  description?: string;
+  location?: string;
+  attendees?: string;
+  organizer?: string;
+  status?: string;
+}
+
 export interface SyncContext {
   syncConfigId: string;
   calendarId: string;
@@ -18,6 +35,8 @@ export interface SyncContext {
   spreadsheetId: string;
   sheetName: string;
   syncToken?: string | null;
+  filterConfig?: FilterConfig | null;
+  columnMapping?: ColumnMapping | null;
 }
 
 export interface SyncedEventRecord {
@@ -60,6 +79,43 @@ export function hashEvent(event: GoogleCalendarEvent): string {
   return hash.toString(16);
 }
 
+// Check if event matches filter config
+export function eventMatchesFilter(
+  event: GoogleCalendarEvent,
+  filterConfig?: FilterConfig | null
+): boolean {
+  if (!filterConfig) return true;
+
+  // Check time range
+  const eventStart = event.start.dateTime || event.start.date;
+  if (eventStart) {
+    const eventDate = new Date(eventStart);
+
+    if (filterConfig.timeRangeStart) {
+      const startDate = new Date(filterConfig.timeRangeStart);
+      if (eventDate < startDate) return false;
+    }
+
+    if (filterConfig.timeRangeEnd) {
+      const endDate = new Date(filterConfig.timeRangeEnd);
+      // Set to end of day for inclusive comparison
+      endDate.setHours(23, 59, 59, 999);
+      if (eventDate > endDate) return false;
+    }
+  }
+
+  // Check keywords (if any keyword matches, event passes)
+  if (filterConfig.keywords && filterConfig.keywords.length > 0) {
+    const title = (event.summary || "").toLowerCase();
+    const hasMatch = filterConfig.keywords.some((keyword) =>
+      title.includes(keyword.toLowerCase())
+    );
+    if (!hasMatch) return false;
+  }
+
+  return true;
+}
+
 // Format event for spreadsheet row
 export function formatEventRow(
   event: GoogleCalendarEvent,
@@ -99,6 +155,53 @@ export function formatEventRow(
     event.status || "confirmed",
     event.id, // Event ID for tracking
   ];
+}
+
+// Format event row with custom column mapping
+export function formatEventRowWithMapping(
+  event: GoogleCalendarEvent,
+  calendarName: string,
+  columnMapping: ColumnMapping
+): { values: Map<string, string>; eventId: string } {
+  const startTime = event.start.dateTime || event.start.date || "";
+  const endTime = event.end.dateTime || event.end.date || "";
+
+  const attendees =
+    event.attendees
+      ?.filter((a) => !a.self)
+      .map((a) => a.displayName || a.email)
+      .join(", ") || "";
+
+  const organizer = event.organizer?.displayName || event.organizer?.email || "";
+
+  const values = new Map<string, string>();
+
+  if (columnMapping.title) {
+    values.set(columnMapping.title, event.summary || "(No title)");
+  }
+  if (columnMapping.start) {
+    values.set(columnMapping.start, startTime);
+  }
+  if (columnMapping.end) {
+    values.set(columnMapping.end, endTime);
+  }
+  if (columnMapping.description) {
+    values.set(columnMapping.description, event.description || "");
+  }
+  if (columnMapping.location) {
+    values.set(columnMapping.location, event.location || "");
+  }
+  if (columnMapping.attendees) {
+    values.set(columnMapping.attendees, attendees);
+  }
+  if (columnMapping.organizer) {
+    values.set(columnMapping.organizer, organizer);
+  }
+  if (columnMapping.status) {
+    values.set(columnMapping.status, event.status || "confirmed");
+  }
+
+  return { values, eventId: event.id };
 }
 
 export interface SyncDependencies {
@@ -204,8 +307,13 @@ export async function syncCalendarToSheet(
         if (existingSynced && existingSynced.status === "active") {
           eventsToDelete.push(existingSynced);
         }
+      } else if (!eventMatchesFilter(event, context.filterConfig)) {
+        // Event doesn't match filter - skip it, but if it was synced before, delete it
+        if (existingSynced && existingSynced.status === "active") {
+          eventsToDelete.push(existingSynced);
+        }
       } else if (!existingSynced) {
-        // New event
+        // New event that matches filter
         eventsToAdd.push(event);
       } else {
         // Check if event changed

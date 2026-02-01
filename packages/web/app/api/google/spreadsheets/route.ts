@@ -38,7 +38,11 @@ export const GET = routeHandler(async (req, user) => {
 
     const { orgId, connectionId } = query.data;
 
-    const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.READ);
+    const hasAccess = await verifyUserHasPermissionForOrgId(
+      user.uid,
+      orgId,
+      Role.READ
+    );
     if (!hasAccess) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
@@ -96,7 +100,11 @@ export const GET = routeHandler(async (req, user) => {
 
   const { orgId, connectionId } = query.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.READ);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.READ
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

@@ -94,7 +94,9 @@ export function AddDestinationDialog({
         if (!response.ok) {
           throw new Error("Failed to fetch spreadsheets");
         }
-        const data = (await response.json()) as { spreadsheets: SpreadsheetInfo[] };
+        const data = (await response.json()) as {
+          spreadsheets: SpreadsheetInfo[];
+        };
         setSpreadsheets(data.spreadsheets);
       } catch (err) {
         setError("Failed to load spreadsheets. Please try again.");
@@ -183,7 +185,9 @@ export function AddDestinationDialog({
       onOpenChange(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add destination");
+      setError(
+        err instanceof Error ? err.message : "Failed to add destination"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -293,9 +297,7 @@ export function AddDestinationDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={
-              !selectedSheet || !destinationName.trim() || isSubmitting
-            }
+            disabled={!selectedSheet || !destinationName.trim() || isSubmitting}
           >
             {isSubmitting ? "Adding..." : "Add Destination"}
           </Button>

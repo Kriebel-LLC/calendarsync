@@ -123,6 +123,11 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
       );
     }
 
+    // Parse filter config from sync config
+    const filterConfig = config.filterConfig
+      ? JSON.parse(config.filterConfig)
+      : null;
+
     const result = await syncCalendarToAirtable(
       {
         syncConfigId: config.id,
@@ -131,6 +136,7 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
         baseId: destination.airtableBaseId,
         tableId: destination.airtableTableId,
         syncToken: config.syncToken,
+        filterConfig,
       },
       {
         getGoogleAccessToken: () => getValidAccessToken(googleConnection),
@@ -217,6 +223,14 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
       );
     }
 
+    // Parse filter and column mapping config from sync config
+    const filterConfig = config.filterConfig
+      ? JSON.parse(config.filterConfig)
+      : null;
+    const columnMapping = config.columnMapping
+      ? JSON.parse(config.columnMapping)
+      : null;
+
     const result = await syncCalendarToSheet(
       {
         syncConfigId: config.id,
@@ -225,6 +239,8 @@ export const POST = routeHandler<RouteContext>(async (req, user, context) => {
         spreadsheetId: destination.spreadsheetId,
         sheetName: destination.sheetName,
         syncToken: config.syncToken,
+        filterConfig,
+        columnMapping,
       },
       {
         getAccessToken: () => getValidAccessToken(googleConnection),

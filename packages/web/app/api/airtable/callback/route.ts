@@ -33,7 +33,10 @@ export const GET = noAuthRouteHandler(async (req) => {
 
   if (!code || !stateParam) {
     return NextResponse.redirect(
-      new URL(`/dashboard?error=airtable_oauth_invalid`, env.NEXT_PUBLIC_APP_URL)
+      new URL(
+        `/dashboard?error=airtable_oauth_invalid`,
+        env.NEXT_PUBLIC_APP_URL
+      )
     );
   }
 
@@ -43,7 +46,10 @@ export const GET = noAuthRouteHandler(async (req) => {
 
   if (!codeVerifier) {
     return NextResponse.redirect(
-      new URL(`/dashboard?error=airtable_oauth_invalid`, env.NEXT_PUBLIC_APP_URL)
+      new URL(
+        `/dashboard?error=airtable_oauth_invalid`,
+        env.NEXT_PUBLIC_APP_URL
+      )
     );
   }
 
@@ -55,7 +61,10 @@ export const GET = noAuthRouteHandler(async (req) => {
     state = JSON.parse(Buffer.from(stateParam, "base64").toString());
   } catch {
     return NextResponse.redirect(
-      new URL(`/dashboard?error=airtable_oauth_invalid`, env.NEXT_PUBLIC_APP_URL)
+      new URL(
+        `/dashboard?error=airtable_oauth_invalid`,
+        env.NEXT_PUBLIC_APP_URL
+      )
     );
   }
 
@@ -76,7 +85,9 @@ export const GET = noAuthRouteHandler(async (req) => {
 
     // Calculate token expiry times
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
-    const refreshExpiresAt = new Date(Date.now() + tokens.refresh_expires_in * 1000);
+    const refreshExpiresAt = new Date(
+      Date.now() + tokens.refresh_expires_in * 1000
+    );
 
     // Check if connection already exists
     const existing = await db()

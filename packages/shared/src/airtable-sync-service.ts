@@ -14,6 +14,12 @@ import {
   AirtableUpdateRecordRequest,
 } from "./airtable-api";
 
+export interface FilterConfig {
+  timeRangeStart?: string; // ISO date string
+  timeRangeEnd?: string; // ISO date string
+  keywords?: string[]; // Keywords to filter event titles
+}
+
 export interface AirtableSyncContext {
   syncConfigId: string;
   calendarId: string;
@@ -21,6 +27,7 @@ export interface AirtableSyncContext {
   baseId: string;
   tableId: string;
   syncToken?: string | null;
+  filterConfig?: FilterConfig | null;
 }
 
 export interface AirtableSyncedEventRecord {
@@ -39,6 +46,43 @@ export interface AirtableSyncResult {
   newSyncToken?: string;
   fullSyncRequired: boolean;
   errors: string[];
+}
+
+// Check if event matches filter config
+export function eventMatchesFilter(
+  event: GoogleCalendarEvent,
+  filterConfig?: FilterConfig | null
+): boolean {
+  if (!filterConfig) return true;
+
+  // Check time range
+  const eventStart = event.start.dateTime || event.start.date;
+  if (eventStart) {
+    const eventDate = new Date(eventStart);
+
+    if (filterConfig.timeRangeStart) {
+      const startDate = new Date(filterConfig.timeRangeStart);
+      if (eventDate < startDate) return false;
+    }
+
+    if (filterConfig.timeRangeEnd) {
+      const endDate = new Date(filterConfig.timeRangeEnd);
+      // Set to end of day for inclusive comparison
+      endDate.setHours(23, 59, 59, 999);
+      if (eventDate > endDate) return false;
+    }
+  }
+
+  // Check keywords (if any keyword matches, event passes)
+  if (filterConfig.keywords && filterConfig.keywords.length > 0) {
+    const title = (event.summary || "").toLowerCase();
+    const hasMatch = filterConfig.keywords.some((keyword) =>
+      title.includes(keyword.toLowerCase())
+    );
+    if (!hasMatch) return false;
+  }
+
+  return true;
 }
 
 // Generate a hash for event data to detect changes
@@ -216,8 +260,13 @@ export async function syncCalendarToAirtable(
         if (existingSynced && existingSynced.status === "active") {
           eventsToDelete.push(existingSynced);
         }
+      } else if (!eventMatchesFilter(event, context.filterConfig)) {
+        // Event doesn't match filter - skip it, but if it was synced before, delete it
+        if (existingSynced && existingSynced.status === "active") {
+          eventsToDelete.push(existingSynced);
+        }
       } else if (!existingSynced) {
-        // New event
+        // New event that matches filter
         eventsToAdd.push(event);
       } else {
         // Check if event changed

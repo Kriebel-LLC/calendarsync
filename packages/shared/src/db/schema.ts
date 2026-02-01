@@ -308,6 +308,13 @@ export const calendars = sqliteTable("calendars", {
     .$onUpdate(() => new Date()),
 });
 
+// Sync interval enum values (in minutes)
+export enum SyncInterval {
+  FIFTEEN_MINUTES = 15,
+  HOURLY = 60,
+  DAILY = 1440,
+}
+
 // Sync configurations - links calendars to destinations
 export const syncConfigs = sqliteTable(
   "sync_configs",
@@ -316,6 +323,16 @@ export const syncConfigs = sqliteTable(
     orgId: text("org_id", { length: 191 }).notNull(),
     calendarId: text("calendar_id", { length: 191 }).notNull(),
     destinationId: text("destination_id", { length: 191 }).notNull(),
+    // Sync frequency in minutes (15, 60, or 1440 for daily)
+    syncIntervalMinutes: integer("sync_interval_minutes")
+      .default(SyncInterval.HOURLY)
+      .notNull(),
+    // Column mapping configuration (JSON string)
+    // Maps calendar fields to destination columns, e.g. {"title": "A", "start": "B", "end": "C"}
+    columnMapping: text("column_mapping"),
+    // Filter configuration (JSON string)
+    // e.g. {"timeRangeStart": "2024-01-01", "timeRangeEnd": "2024-12-31", "keywords": ["meeting", "call"]}
+    filterConfig: text("filter_config"),
     // Incremental sync token from Google Calendar API
     syncToken: text("sync_token"),
     lastSyncAt: integer("last_sync_at", { mode: "timestamp" }),

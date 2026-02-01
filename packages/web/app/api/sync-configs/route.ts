@@ -4,7 +4,12 @@ import { routeHandler } from "@/lib/route";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
-import { syncConfigs, calendars, destinations } from "shared/src/db/schema";
+import {
+  syncConfigs,
+  calendars,
+  destinations,
+  SyncInterval,
+} from "shared/src/db/schema";
 import { Role } from "shared/src/types/role";
 import { z } from "zod";
 
@@ -12,10 +17,44 @@ const querySchema = z.object({
   orgId: z.string().min(1),
 });
 
+const columnMappingSchema = z
+  .object({
+    title: z.string().optional(),
+    start: z.string().optional(),
+    end: z.string().optional(),
+    description: z.string().optional(),
+    location: z.string().optional(),
+    attendees: z.string().optional(),
+    organizer: z.string().optional(),
+    status: z.string().optional(),
+  })
+  .optional();
+
+const filterConfigSchema = z
+  .object({
+    timeRangeStart: z.string().optional(),
+    timeRangeEnd: z.string().optional(),
+    keywords: z.array(z.string()).optional(),
+  })
+  .optional();
+
 const createSchema = z.object({
   orgId: z.string().min(1),
   calendarId: z.string().min(1),
   destinationId: z.string().min(1),
+  syncIntervalMinutes: z
+    .number()
+    .refine(
+      (val) =>
+        val === SyncInterval.FIFTEEN_MINUTES ||
+        val === SyncInterval.HOURLY ||
+        val === SyncInterval.DAILY,
+      { message: "Invalid sync interval" }
+    )
+    .optional()
+    .default(SyncInterval.HOURLY),
+  columnMapping: columnMappingSchema,
+  filterConfig: filterConfigSchema,
 });
 
 // Get sync configs for an org
@@ -31,7 +70,11 @@ export const GET = routeHandler(async (req, user) => {
 
   const { orgId } = query.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.READ);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.READ
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
@@ -50,12 +93,26 @@ export const POST = routeHandler(async (req, user) => {
   const body = createSchema.safeParse(json);
 
   if (!body.success) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json(
+      { error: body.error.errors[0]?.message || "Invalid request" },
+      { status: 400 }
+    );
   }
 
-  const { orgId, calendarId, destinationId } = body.data;
+  const {
+    orgId,
+    calendarId,
+    destinationId,
+    syncIntervalMinutes,
+    columnMapping,
+    filterConfig,
+  } = body.data;
 
-  const hasAccess = await verifyUserHasPermissionForOrgId(user.uid, orgId, Role.WRITE);
+  const hasAccess = await verifyUserHasPermissionForOrgId(
+    user.uid,
+    orgId,
+    Role.WRITE
+  );
   if (!hasAccess) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
@@ -107,6 +164,9 @@ export const POST = routeHandler(async (req, user) => {
     orgId,
     calendarId,
     destinationId,
+    syncIntervalMinutes,
+    columnMapping: columnMapping ? JSON.stringify(columnMapping) : null,
+    filterConfig: filterConfig ? JSON.stringify(filterConfig) : null,
     isEnabled: true,
   };
 

@@ -80,7 +80,9 @@ export function AddCalendarDialog({
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }
-        const data = (await response.json()) as { calendars: GoogleCalendarInfo[] };
+        const data = (await response.json()) as {
+          calendars: GoogleCalendarInfo[];
+        };
         setCalendars(data.calendars);
       } catch (err) {
         setError("Failed to load calendars. Please try again.");
