@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "b5522eea-ae7b-4918-abb2-adb620f94b5c",
-  "prevId": "9f5ee450-9947-45d4-9a65-dad143f886ae",
   "tables": {
     "org_invites": {
       "name": "org_invites",
@@ -77,13 +75,16 @@
       "indexes": {
         "token_org_invites_id_key": {
           "name": "token_org_invites_id_key",
-          "columns": ["token"],
+          "columns": [
+            "token"
+          ],
           "isUnique": true
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "org_users": {
       "name": "org_users",
@@ -137,7 +138,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "orgs": {
       "name": "orgs",
@@ -191,18 +193,23 @@
       "indexes": {
         "orgs_stripe_customer_id_key": {
           "name": "orgs_stripe_customer_id_key",
-          "columns": ["stripe_customer_id"],
+          "columns": [
+            "stripe_customer_id"
+          ],
           "isUnique": true
         },
         "orgs_name_id_key": {
           "name": "orgs_name_id_key",
-          "columns": ["name"],
+          "columns": [
+            "name"
+          ],
           "isUnique": true
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "users": {
       "name": "users",
@@ -263,24 +270,31 @@
       "indexes": {
         "users_stripe_customer_id_key": {
           "name": "users_stripe_customer_id_key",
-          "columns": ["stripe_customer_id"],
+          "columns": [
+            "stripe_customer_id"
+          ],
           "isUnique": true
         },
         "users_stripe_subscription_id_key": {
           "name": "users_stripe_subscription_id_key",
-          "columns": ["stripe_subscription_id"],
+          "columns": [
+            "stripe_subscription_id"
+          ],
           "isUnique": true
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "b5522eea-ae7b-4918-abb2-adb620f94b5c",
+  "prevId": "9f5ee450-9947-45d4-9a65-dad143f886ae",
+  "views": {}
 }
