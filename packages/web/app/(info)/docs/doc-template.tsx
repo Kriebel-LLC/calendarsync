@@ -3,11 +3,9 @@ import "@/styles/mdx.css";
 import { DocsPageHeader } from "@/custom-components/page-header";
 import { DocsPager } from "@/custom-components/pager";
 // import  { DashboardTableOfContents } from "@/custom-components/toc";
-import type { MDXContent } from "mdx/types";
-
 interface DocPageProps {
   metadata: any;
-  content: MDXContent;
+  content: React.ComponentType;
 }
 
 export default function DocPage(props: DocPageProps) {

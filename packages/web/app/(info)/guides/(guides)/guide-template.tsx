@@ -4,8 +4,6 @@ import Link from "next/link";
 import { Icons } from "@/custom-components/icons";
 import { DocsPageHeader } from "@/custom-components/page-header";
 // import  { DashboardTableOfContents } from "@/custom-components/toc";
-import type { MDXContent } from "mdx/types";
-
 import "@/styles/mdx.css";
 
 import { cn } from "components/lib/utils";
@@ -13,7 +11,7 @@ import { buttonVariants } from "components/ui/button";
 
 interface GuidePageProps {
   metadata: any;
-  content: MDXContent;
+  content: React.ComponentType;
 }
 
 export default function GuidePage(props: GuidePageProps) {

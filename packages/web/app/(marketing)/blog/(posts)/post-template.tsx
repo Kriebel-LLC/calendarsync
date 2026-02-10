@@ -5,11 +5,9 @@ import { Icons } from "@/custom-components/icons";
 import { formatDate } from "@/lib/utils";
 import { cn } from "components/lib/utils";
 import { buttonVariants } from "components/ui/button";
-import type { MDXContent } from "mdx/types";
-
 interface PostPageProps {
   metadata: any;
-  content: MDXContent;
+  content: React.ComponentType;
 }
 
 export default function PostPage(props: PostPageProps) {

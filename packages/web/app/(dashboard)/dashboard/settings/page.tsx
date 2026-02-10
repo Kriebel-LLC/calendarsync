@@ -14,7 +14,7 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
-  const user = await getCurrentServerUser(cookies());
+  const user = await getCurrentServerUser(await cookies());
 
   if (!user) {
     redirect("/login");

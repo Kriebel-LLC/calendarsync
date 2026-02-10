@@ -51,20 +51,29 @@ type AuthenticatedHandler<ContextType> = (
   context: ContextType
 ) => Promise<NextResponse>;
 
+// Resolve async params from Next.js 15 route context
+async function resolveContext<T>(context: Record<string, unknown>): Promise<T> {
+  if (context && typeof context === "object" && "params" in context) {
+    return { ...context, params: await context.params } as T;
+  }
+  return context as T;
+}
+
 // Handler to log request info, inject logger, and check auth if required
 export function routeHandler<ContextType>(
   handler: AuthenticatedHandler<ContextType>,
   shouldRedirect?: boolean
 ): ReturnType<typeof withAxiomRouteHandler> {
-  return withAxiomRouteHandler(async (req, context: ContextType) => {
+  return withAxiomRouteHandler(async (req, context) => {
     req.log = req.log.with({ requestId: crypto.randomUUID() });
     req.log.info("Request started"); // TODO: ideally we have userId logged when this is logged
 
+    const resolvedContext = await resolveContext<ContextType>(context);
     const start = Date.now();
     const result = await withAuthentication<ContextType>(
       req,
       handler,
-      context,
+      resolvedContext,
       shouldRedirect
     );
 
@@ -85,12 +94,13 @@ type UnAuthenticatedHandler<ContextType> = (
 export function noAuthRouteHandler<ContextType>(
   handler: UnAuthenticatedHandler<ContextType>
 ): ReturnType<typeof withAxiomRouteHandler> {
-  return withAxiomRouteHandler(async (req, context: ContextType) => {
+  return withAxiomRouteHandler(async (req, context) => {
     req.log = req.log.with({ requestId: crypto.randomUUID() });
     req.log.info("Request started");
 
+    const resolvedContext = await resolveContext<ContextType>(context);
     const start = Date.now();
-    const result = await handler(req, context);
+    const result = await handler(req, resolvedContext);
 
     req.log.info("Request ended", {
       latency: Date.now() - start,

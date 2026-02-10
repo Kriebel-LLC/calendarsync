@@ -18,7 +18,7 @@ export const GET = noAuthRouteHandler<{
   params: { name: string; token: string };
 }>(async (req, context) => {
   const { name, token } = context.params;
-  const user = await getCurrentServerUser(cookies());
+  const user = await getCurrentServerUser(await cookies());
   if (!user) {
     const completionUrl = `/${name}/accept-invite/${token}`;
     const redirectUrl = req.nextUrl.clone();

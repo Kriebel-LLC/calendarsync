@@ -16,7 +16,8 @@ import {
   Laptop,
   Link,
   Loader2,
-  LucideProps,
+  type LucideIcon,
+  type LucideProps,
   Moon,
   MoreVertical,
   Pause,
@@ -31,7 +32,6 @@ import {
   Twitter,
   User,
   X,
-  type Icon as LucideIcon,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
