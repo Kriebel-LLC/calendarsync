@@ -21,7 +21,7 @@ export const metadata = {
 };
 
 export default async function IndexPage() {
-  const isLoggedIn = cookies().has(authConfig.cookieName);
+  const isLoggedIn = (await cookies()).has(authConfig.cookieName);
 
   return (
     <>

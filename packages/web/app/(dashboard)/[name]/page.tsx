@@ -24,14 +24,15 @@ export const metadata = {
 export default async function DashboardPage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
-  const user = await getCurrentServerUser(cookies());
+  const { name } = await params;
+  const user = await getCurrentServerUser(await cookies());
   if (!user) {
     redirect("/login");
   }
 
-  const userInOrg = await getOrgUserForOrgName(user.uid, params.name);
+  const userInOrg = await getOrgUserForOrgName(user.uid, name);
   if (!userInOrg || !hasPermission(userInOrg.role, Role.READ)) {
     notFound();
   }
@@ -69,7 +70,7 @@ export default async function DashboardPage({
       />
       <CalendarSyncDashboard
         orgId={userInOrg.orgId}
-        orgName={params.name}
+        orgName={name}
         connections={connections}
         calendars={cals}
         destinations={dests}

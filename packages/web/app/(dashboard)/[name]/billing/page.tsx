@@ -18,14 +18,15 @@ export const metadata = {
 export default async function BillingPage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
-  const user = await getCurrentServerUser(cookies());
+  const { name } = await params;
+  const user = await getCurrentServerUser(await cookies());
   if (!user) {
     redirect("/login");
   }
 
-  const userInOrg = await getOrgUserForOrgName(user.uid, params.name);
+  const userInOrg = await getOrgUserForOrgName(user.uid, name);
   if (!userInOrg || !hasPermission(userInOrg.role, Role.READ)) {
     notFound();
   }
@@ -41,7 +42,7 @@ export default async function BillingPage({
       />
       <div className="grid gap-8">
         <OrgBillingForm
-          orgName={params.name}
+          orgName={name}
           orgPlan={userInOrg.orgPlan}
           subscriptionPlan={subscriptionPlan}
           currentPeriodEnd={userInOrg.orgStripeCurrentPeriodEnd}
