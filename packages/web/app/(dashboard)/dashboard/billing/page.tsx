@@ -25,7 +25,7 @@ export const metadata = {
 };
 
 export default async function BillingPage() {
-  const user = await getCurrentServerUser(cookies());
+  const user = await getCurrentServerUser(await cookies());
 
   if (!user) {
     redirect("/login");

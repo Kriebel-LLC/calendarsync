@@ -21,14 +21,15 @@ export const metadata = {
 export default async function SettingsPage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
-  const user = await getCurrentServerUser(cookies());
+  const { name } = await params;
+  const user = await getCurrentServerUser(await cookies());
   if (!user) {
     redirect("/login");
   }
 
-  const userInOrg = await getOrgUserForOrgName(user.uid, params.name);
+  const userInOrg = await getOrgUserForOrgName(user.uid, name);
   if (!userInOrg || !hasPermission(userInOrg.role, Role.READ)) {
     notFound();
   }
@@ -61,13 +62,13 @@ export default async function SettingsPage({
         <OrgUsers
           members={membersWithDetail}
           invites={invites}
-          orgName={params.name}
+          orgName={name}
           currentUserId={user.uid}
         />
       </div>
       <OrgNameForm
         orgId={userInOrg.orgId}
-        orgName={params.name}
+        orgName={name}
         role={userInOrg.role}
       />
     </>

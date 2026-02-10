@@ -15,7 +15,7 @@ interface MarketingLayoutProps {
 export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
-  const isLoggedIn = cookies().has(authConfig.cookieName);
+  const isLoggedIn = (await cookies()).has(authConfig.cookieName);
 
   return (
     <div className="flex min-h-screen flex-col">

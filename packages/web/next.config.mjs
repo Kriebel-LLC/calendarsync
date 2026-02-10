@@ -22,11 +22,12 @@ const nextConfig = {
   transpilePackages: ["components"],
   reactStrictMode: true,
   images: {
-    domains: ["avatars.githubusercontent.com", "lh3.googleusercontent.com"],
+    remotePatterns: [
+      { hostname: "avatars.githubusercontent.com" },
+      { hostname: "lh3.googleusercontent.com" },
+    ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ["jose"],
-  },
+  serverExternalPackages: ["jose"],
 };
 
 if (process.env.NODE_ENV === "development") {

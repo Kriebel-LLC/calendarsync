@@ -1,10 +1,8 @@
 import "@/styles/mdx.css";
 
-import type { MDXContent } from "mdx/types";
-
 interface PageProps {
   metadata: any;
-  content: MDXContent;
+  content: React.ComponentType;
 }
 
 export default function PageTemplate(props: PageProps) {
