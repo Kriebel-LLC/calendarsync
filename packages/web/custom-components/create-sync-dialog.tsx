@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "components/ui/select";
 import { Label } from "components/ui/label";
-import { Calendar, Destination } from "shared/src/db/schema";
+import { Calendar, Destination, DestinationType } from "shared/src/db/schema";
 
 interface CreateSyncDialogProps {
   open: boolean;
@@ -135,16 +135,41 @@ export function CreateSyncDialog({
                 <SelectValue placeholder="Select a destination" />
               </SelectTrigger>
               <SelectContent>
-                {enabledDestinations.map((destination) => (
-                  <SelectItem key={destination.id} value={destination.id}>
-                    <div>
-                      <div>{destination.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {destination.spreadsheetName} - {destination.sheetName}
+                {enabledDestinations.map((destination) => {
+                  const typeLabel =
+                    destination.type === DestinationType.NOTION
+                      ? "Notion"
+                      : destination.type === DestinationType.AIRTABLE
+                        ? "Airtable"
+                        : "Google Sheets";
+                  const detail =
+                    destination.type === DestinationType.NOTION
+                      ? destination.notionDatabaseName
+                      : destination.type === DestinationType.AIRTABLE
+                        ? [
+                            destination.airtableBaseName,
+                            destination.airtableTableName,
+                          ]
+                            .filter(Boolean)
+                            .join(" - ")
+                        : [
+                            destination.spreadsheetName,
+                            destination.sheetName,
+                          ]
+                            .filter(Boolean)
+                            .join(" - ");
+                  return (
+                    <SelectItem key={destination.id} value={destination.id}>
+                      <div>
+                        <div>{destination.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {typeLabel}
+                          {detail ? ` - ${detail}` : ""}
+                        </div>
                       </div>
-                    </div>
-                  </SelectItem>
-                ))}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>

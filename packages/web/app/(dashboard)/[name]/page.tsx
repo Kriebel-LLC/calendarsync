@@ -65,7 +65,7 @@ export default async function DashboardPage({
     <DashboardShell>
       <DashboardHeader
         heading="CalendarSync"
-        text="Sync your Google Calendar events to Google Sheets."
+        text="Sync your Google Calendar events to Google Sheets, Notion, and Airtable."
       />
       <CalendarSyncDashboard
         orgId={userInOrg.orgId}
